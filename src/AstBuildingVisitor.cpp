@@ -63,16 +63,20 @@ std::any AstBuildingVisitor::visitInferredDecl(GazpreaParser::InferredDeclContex
     return t;
 }
 
+// ^(QUALIFIER)     eg. ^(VAR)
 std::any AstBuildingVisitor::visitQualifier(GazpreaParser::QualifierContext *ctx){
     // make AST node from the first token in this context
     return std::make_shared<AST>(ctx->getStart()); 
 }
 
+
+// ^(TYPE)         eg. ^(INTEGER)
 std::any AstBuildingVisitor::visitType(GazpreaParser::TypeContext *ctx){
     // make AST node from the first token in this context
-    return std::make_shared<AST>(ctx->getStart()); 
+    return std::make_shared<AST>(ctx->getStart()->getSymbol()); 
 }
 
+// ^(TUPLE_TYPE TUPLE_FIELD+)
 std::any AstBuildingVisitor::visitTupleType(GazpreaParser::TupleTypeContext *ctx){
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::TUPLE_TYPE);
     for ( auto tf : ctx->tupleField() ) {
@@ -81,6 +85,7 @@ std::any AstBuildingVisitor::visitTupleType(GazpreaParser::TupleTypeContext *ctx
     return t;
 }
 
+// ^(TUPLE_FIELD TYPE ID)
 std::any AstBuildingVisitor::visitTupleField(GazpreaParser::TupleFieldContext *ctx){
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::TUPLE_FIELD);
     t->addChild(visit(ctx->tupleFieldType())); // add type node
@@ -94,7 +99,7 @@ std::any AstBuildingVisitor::visitTupleField(GazpreaParser::TupleFieldContext *c
     return t;
 }
 
-
+// START NEXT ITERATION HERE
 
 
 // ^(ASSIGN ID EXPR)
@@ -179,6 +184,8 @@ std::any AstBuildingVisitor::visitEqNotEqExpr(GazpreaParser::EqNotEqExprContext 
     return t;
 }
 
+
+// DO TILL HERE
 std::any AstBuildingVisitor::visitParenthesisExpr(GazpreaParser::ParenthesisExprContext *ctx){
     return visit(ctx->expr());
 }
@@ -187,36 +194,50 @@ std::any AstBuildingVisitor::visitIdExpr(GazpreaParser::IdExprContext *ctx){
     return std::make_shared<AST>(ctx->ID()->getSymbol()); 
 }
 
-std::any AstBuildingVisitor::visitIntExpr(GazpreaParser::IntExprContext *ctx){
+std::any AstBuildingVisitor::visitIntLiteralExpr(GazpreaParser::IntLiteralExprContext *ctx){
     return std::make_shared<AST>(ctx->INT()->getSymbol());
 }
-// ^(INDEX_EXPR (the domain expr) (the index expr))
-std::any AstBuildingVisitor::visitIndexExpr(GazpreaParser::IndexExprContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::INDEX_EXPR);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
+
+std::any AstBuildingVisitor::visitBoolLiteralExpr(GazpreaParser::BoolLiteralExprContext *ctx){
+    return std::make_shared<AST>(ctx->BOOL()->getSymbol());
+}
+
+std::any AstBuildingVisitor::visitCharLiteralExpr(GazpreaParser::CharLiteralExprContext *ctx){
+    return std::make_shared<AST>(ctx->CHAR()->getSymbol());
+}
+
+std::any AstBuildingVisitor::visitPreDotReal(GazpreaParser::PreDotRealContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
+    t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
+    if( ctx->INT(1) != nullptr){
+        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
+    }
     return t;
 }
-// ^(RANGE (the lb expr) (the ub expr))
-std::any AstBuildingVisitor::visitRangeExpr(GazpreaParser::RangeExprContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::RANGE);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
+
+std::any AstBuildingVisitor::visitPostDotReal(GazpreaParser::PostDotRealContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
+    if(ctx->getStart() == GazpreaParser::DOT){
+        t->addChild(std::make_shared<AST>());
+        t->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
+    }
+    else{
+        t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
+        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
+    }
     return t;
 }
-// ^(GENERATOR_EXPR ID (the domain expr) (the evaluated expr))
-std::any AstBuildingVisitor::visitGeneratorExpr(GazpreaParser::GeneratorExprContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::GENERATOR_EXPR);
-    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
+
+std::any AstBuildingVisitor::visitIntEReal(GazpreaParser::IntERealContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::SCIENTIFIC_REAL);
+    t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
+    t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
     return t;
 }
-// ^(FILTER_EXPR ID (the domain expr) (the predicate expr))
-std::any AstBuildingVisitor::visitFilterExpr(GazpreaParser::FilterExprContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::FILTER_EXPR);
-    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
+
+std::any AstBuildingVisitor::visitRealEReal(GazpreaParser::RealERealContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::SCIENTIFIC_REAL);
+    t->addChild(visit(ctx->real()));
+    t->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
     return t;
 }

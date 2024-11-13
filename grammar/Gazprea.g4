@@ -4,7 +4,9 @@ tokens{
     FILE,
     VAR_DECL,
     TUPLE_TYPE,
-    TUPLE_FIELD
+    TUPLE_FIELD,
+    DOT_REAL,
+    SCIENTIFIC_REAL
 }
 
 file:   stat* EOF;
@@ -105,10 +107,10 @@ expr:   '(' expr ')'                                                            
     |   ID                                                                                                              #IdExpr
     ;
 
-real:   INT '.' INT?
-    |   INT? '.' INT
-    |   INT ('e'|'E') INT
-    |   real ('e'|'E') INT
+real:   INT '.' INT?                        #PostDotReal
+    |   INT? '.' INT                        #PreDotreal
+    |   INT ('e'|'E') INT                   #IntEReal
+    |   real ('e'|'E') INT                  #RealEReal
     ;
 
 // Lexer Rules
@@ -155,7 +157,8 @@ BOOL:   ('true' | 'false');
 ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
 INT:	( '+' | '-')? DIGIT+;
 
-
+// OPERATORS USED IN AST
+DOT: '.';
 
 
 // Skip whitespace

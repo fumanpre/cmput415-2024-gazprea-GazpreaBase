@@ -105,6 +105,12 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitIntLiteralExpr(GazpreaParser::IntLiteralExprContext *ctx) override;
     
-    std::any visitReal(GazpreaParser::RealContext *ctx) override;
+    std::any visitPreDotReal(GazpreaParser::PreDotRealContext *ctx) override;
+
+    std::any visitPostDotReal(GazpreaParser::PostDotRealContext *ctx) override;
+
+    std::any visitIntEReal(GazpreaParser::IntERealContext *ctx) override;
+
+    std::any visitRealEReal(GazpreaParser::RealERealContext *ctx) override;
 };
 #endif
