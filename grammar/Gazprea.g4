@@ -84,10 +84,10 @@ sizedMatType:   type '[' INT ',' INT ']' ;
 unSizedMatType: type '[' ( INT | '*' ) ',' ( INT | '*' ) ']';
 tupleType:  'tuple' '(' tupleField ( ',' tupleField )+ ')' ;
 
-tupeField:  tupleFieldType ID?;
+tupleField:  tupleFieldType ID?;
 
 
-expr:   '(' expr ')'                                                                                                    #ParanthesisExpr
+expr:   '(' expr ')'                                                                                                    #ParenthesisExpr
     |   ID '.' (INT | ID)                                                                                               #DotAccessExpr
     |   <assoc=right> op=('+' | '-' | 'not') expr                                                                       #UnaryExpr
     |   <assoc=right> expr '^' expr                                                                                     #ExponentExpr
@@ -108,7 +108,7 @@ expr:   '(' expr ')'                                                            
     ;
 
 real:   INT '.' INT?                        #PostDotReal
-    |   INT? '.' INT                        #PreDotreal
+    |   INT? '.' INT                        #PreDotReal
     |   INT ('e'|'E') INT                   #IntEReal
     |   real ('e'|'E') INT                  #RealEReal
     ;
