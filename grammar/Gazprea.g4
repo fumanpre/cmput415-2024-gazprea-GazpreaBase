@@ -1,59 +1,63 @@
-grammar Gazprea;
+grammar Cymbol;
 
-file:   stat* EOF; // comment
+tokens{
+    FILE,
+    VAR_DECL,
+    TUPLE_TYPE,
+    TUPLE_FIELD
+}
 
-stat:   assignment ';'                              #assignmentStat
-    |   variableDeclaration ';'                     #declarationStat
-    |   'typedef' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) ID ';' #typedefStat
-    |   expr '->' OUTPUTSTREAM ';'                  #outputStat
-    |   inputStat ';'                               #inputStat
-    |   blockStat                                   #blockStat
-    |   'if' '(' expr ')' stat ('else' stat)?       #ifStat
-    |   loopStat                                    #loopStat
-    |   'break' ';'                                 #breakStat
-    |   'continue' ';'                              #continueStat
-    |   'return' expr? ';'                          #returnStat
-    |   functionDeclaration ';'                     #funcDecStat
-    |   functionDefinition                          #funcDefStat
+file:   stat* EOF;
+
+stat:   assignment ';'                              #AssignmentStatement
+    |   variableDeclaration ';'                     #DeclarationStatement
+    |   'typedef' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) ID ';' #TypedefStatement
+    |   expr '->' OUTPUTSTREAM ';'                  #OutputStatement
+    |   inputStat ';'                               #InputStatement
+    |   blockStat                                   #BlockStatement
+    |   'if' '(' expr ')' stat ('else' stat)?       #IfStatement
+    |   loopStat                                    #LoopStatement
+    |   'break' ';'                                 #BreakStatement
+    |   'continue' ';'                              #ContinueStatement
+    |   'return' expr? ';'                          #ReturnStatement
+    |   functionDeclaration ';'                     #FuncDecStatement
+    |   functionDefinition                          #FuncDefStatement
+    |   procedureDeclaration                        #ProcDecStatement
+    |   procedureDefinition                         #ProcDefStatement
     ;
 
 blockStat:  '{' stat* '}';
 
 functionDeclaration: 'function' ID '(' ( allTypes ID? (',' allTypes ID? )* )? ')' 'returns' allTypes;
 
-functionDefinition: 'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes '=' expr ';' #exprReturnFunction
-                |   'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes blockStat    #blockEndFunction
+functionDefinition: 'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes '=' expr ';' #ExprReturnFunction
+                |   'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes blockStat    #BlockEndFunction
                 ;
 
-assignment:     ID '=' expr     #idAssign
-            |   ID '.' (INT | ID) '=' expr    #tupleFieldAssign
-            |   ID (, ID)+ '=' expr             #tupleUnpackAssign
+procedureDeclaration: 'procedure' ID '(' ( qualifier? allTypes ID? (',' qualifier? allTypes ID?)* )? ')' ( 'returns' allTypes )? ';' ;
+
+procedureDefinition: 'procedure' ID '(' ( qualifier? allTypes ID (',' qualifier? allTypes ID)* )? ')' ( blockStat | 'returns' allTypes blockStat );
+
+
+assignment:     ID '=' expr     #IdAssign
+            |   ID '.' (INT | ID) '=' expr    #TupleFieldAssign
+            |   ID (',' ID)+ '=' expr         #TupleUnpackAssign
             ;
 
-inputStat:  ID '<-' INPUTSTREAM     #idInput
-        |   ID '.' (INT | ID) '<-' INPUTSTREAM #tupleFieldInput
+inputStat:  ID '<-' INPUTSTREAM     #IdInput
+        |   ID '.' (INT | ID) '<-' INPUTSTREAM #TupleFieldInput
         ;
 
 //TODO iterator loops
-loopStat:   'loop' stat     #infiniteLoop
-        |   'loop' 'while' '(' expr ')' stat        #whileLoop
-        |   'loop' stat 'while' '(' expr ')' ';'    #doWhileLoop
+loopStat:   'loop' stat     #InfiniteLoop
+        |   'loop' 'while' '(' expr ')' stat        #WhileLoop
+        |   'loop' stat 'while' '(' expr ')' ';'    #DoWhileLoop
         ;
 
-variableDeclaration:   qualifier? type ID ('=' expr)? #decl
-                    |   qualifier ID '=' expr #inferredDecl
-                    |   vectorDeclaration #vecDecl
-                    |   matrixDeclaration #matDecl
-                    |   tupleType ID ('=' expr)? #tupleDecl
+variableDeclaration:    qualifier? fixedSizeType ID ('=' expr)?   #Decl
+                    |   qualifier ID '=' expr           #InferredDecl
+                    |   qualifier? varSizedType ID '=' expr     #VarSizedDecl
                     ;
-
-vectorDeclaration:  sizedVecType ID ('=' expr)? #sizedVecDecl
-                |   unSizedVecType ID '=' expr #unSizedVecDecl
-                ;
-
-matrixDeclaration:  sizedMatType ID ('=' expr)? #sizedMatDecl
-                |   unSizedMatType ID '=' expr #unSizedMatDecl
-                ;
 
 qualifier: 'var'
          | 'const'
@@ -67,50 +71,89 @@ type: 'boolean'
     | ID // this is for typedef types
     ;
 
+tupleFieldType: ( type | sizedVecType | sizedMatType );
+fixedSizeType: ( type | sizedVecType | sizedMatType | tupleType );
+varSizedType: ( unSizedVecType | unSizedMatType );
 allTypes:   ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType );
 
 sizedVecType:   type '[' INT ']';
 unSizedVecType: type '[' '*' ']';
 sizedMatType:   type '[' INT ',' INT ']' ;
 unSizedMatType: type '[' ( INT | '*' ) ',' ( INT | '*' ) ']';
-tupleType:  'tuple' '(' ( type | sizedVecType | sizedMatType ) ID? ( ',' ( type | sizedVecType | sizedMatType ) ID? )+ ')' ;
+tupleType:  'tuple' '(' tupleField ( ',' tupleField )+ ')' ;
+
+tupeField:  tupleFieldType ID?;
 
 
-expr:   '(' expr ')'                                                                                                    #paranthesisExpr
-    |   ID '.' (INT | ID)                                                                                               #dotAccessExpr
-    |   <assoc=right> op=('+' | '-' | 'not') expr                                                                       #unaryExpr
-    |   <assoc=right> expr '^' expr                                                                                     #exponentExpr
-    |   expr op=('*' | '/' | '%') expr                                                                                  #multDivRemExpr
-    |   expr op=('+' | '-') expr                                                                                        #addSubExpr
-    |   expr op=('<' | '>' | '<=' | '>=') expr                                                                          #ltgtComparisonExpr
-    |   expr op=('==' | '!=') expr                                                                                      #eqComparisonExpr
-    |   expr 'and' expr                                                                                                 #booleanAndExpr
-    |   expr op=('or'|'xor')                                                                                            #booleanOrExpr
-    |   'as' '<' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) '>' '(' expr ')'   #typeCastExpr
-    |   '(' expr ( ',' expr )+ ')'                                                                                      #tupleLiteralExpr
-    |   STRING                                                                                                          #stringLiteralExpr
-    |   real                                                                                                            #realLiteralExpr    
-    |   BOOL                                                                                                            #boolLiteralExpr
-    |   CHAR                                                                                                            #charLiteralExpr
-    |   INT                                                                                                             #intLiteralExpr
-    |   ID                                                                                                              #idExpr
+expr:   '(' expr ')'                                                                                                    #ParanthesisExpr
+    |   ID '.' (INT | ID)                                                                                               #DotAccessExpr
+    |   <assoc=right> op=('+' | '-' | 'not') expr                                                                       #UnaryExpr
+    |   <assoc=right> expr '^' expr                                                                                     #ExponentExpr
+    |   expr op=('*' | '/' | '%') expr                                                                                  #MultDivRemExpr
+    |   expr op=('+' | '-') expr                                                                                        #AddSubExpr
+    |   expr op=('<' | '>' | '<=' | '>=') expr                                                                          #LessGreatExpr
+    |   expr op=('==' | '!=') expr                                                                                      #EqNotEqExpr
+    |   expr 'and' expr                                                                                                 #BooleanAndExpr
+    |   expr op=('or'|'xor')                                                                                            #BooleanOrExpr
+    |   'as' '<' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) '>' '(' expr ')'   #TypeCastExpr
+    |   '(' expr ( ',' expr )+ ')'                                                                                      #TupleLiteralExpr
+    |   STRING                                                                                                          #StringLiteralExpr
+    |   real                                                                                                            #RealLiteralExpr
+    |   BOOL                                                                                                            #BoolLiteralExpr
+    |   CHAR                                                                                                            #CharLiteralExpr
+    |   INT                                                                                                             #IntLiteralExpr
+    |   ID                                                                                                              #IdExpr
     ;
 
 real:   INT '.' INT?
     |   INT? '.' INT
-    |   ( real | INT ) ('e'|'E') INT
+    |   INT ('e'|'E') INT
+    |   real ('e'|'E') INT
     ;
 
 // Lexer Rules
 OUTPUTSTREAM:   'std_output';
 INPUTSTREAM:    'std_input';
+XOR         : 'xor';
+AND         : 'and';
+AS          : 'as';
+BOOLEAN     : 'boolean';
+BREAK       : 'break';
+BY          : 'by';
+CALL        : 'call';
+CHARACTER   : 'character';
+COLUMNS     : 'columns';
+CONST       : 'const';
+CONTINUE    : 'continue';
+ELSE        : 'else';
+FORMAT      : 'format';
+FUNCTION    : 'function';
+IF          : 'if';
+IN          : 'in';
+INTEGER     : 'integer';
+LENGTH      : 'length';
+LOOP        : 'loop';
+NOT         : 'not';
+OR          : 'or';
+PROCEDURE   : 'procedure';
+REAL        : 'real';
+RETURN      : 'return';
+RETURNS     : 'returns';
+REVERSE     : 'reverse';
+ROWS        : 'rows';
+TUPLE       : 'tuple';
+TYPEDEF     : 'typedef';
+VAR         : 'var';
+WHILE       : 'while';
+
+
 
 // Literals
 STRING: '"' ( ESCAPE | . )*? '"';
 CHAR:   '\''  ( ESCAPE | . ) '\'';
 BOOL:   ('true' | 'false');
 ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
-INT:	'-'? DIGIT+;
+INT:	( '+' | '-')? DIGIT+;
 
 
 
