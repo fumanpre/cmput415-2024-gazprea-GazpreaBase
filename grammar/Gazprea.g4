@@ -1,4 +1,4 @@
-grammar Cymbol;
+grammar Gazprea;
 
 tokens{
     FILE,
