@@ -2,12 +2,50 @@
 #define ASTBUILDINGVISITOR_H
 #include "GazpreaBaseVisitor.h"
 
-using namespace Gazprea;
+using namespace gazprea;
 
 class AstBuildingVisitor : public GazpreaBaseVisitor {
     public:
 
     std::any visitFile(GazpreaParser::FileContext *ctx) override;
+
+    std::any visitDeclarationStatement(GazpreaParser::DeclarationStatementContext *ctx);
+
+    std::any visitDecl(GazpreaParser::DeclContext *ctx) override;
+
+    std::any visitInferredDecl(GazpreaParser::InferredDeclContext *ctx) override;
+
+    std::any visitVarSizedDecl(GazpreaParser::VarSizedDeclContext *ctx) override;
+
+    std::any visitQualifier(GazpreaParser::QualifierContext *ctx) override;
+
+    std::any visitType(GazpreaParser::TypeContext *ctx) override;
+
+    std::any visitTupleType(GazpreaParser::TupleTypeContext *ctx) override;
+
+    std::any visitTupleField(GazpreaParser::TupleFieldContext *ctx) override;
+
+    std::any visitParenthesisExpr(GazpreaParser::ParenthesisExprContext *ctx) override;
+
+    std::any visitIdExpr(GazpreaParser::IdExprContext *ctx) override;
+
+    std::any visitIntLiteralExpr(GazpreaParser::IntLiteralExprContext *ctx) override;
+
+    std::any visitBoolLiteralExpr(GazpreaParser::BoolLiteralExprContext *ctx) override;
+
+    std::any visitCharLiteralExpr(GazpreaParser::CharLiteralExprContext *ctx) override;
+
+    std::any visitPreDotReal(GazpreaParser::PreDotRealContext *ctx) override;
+
+    std::any visitPostDotReal(GazpreaParser::PostDotRealContext *ctx) override;
+
+    std::any visitIntEReal(GazpreaParser::IntERealContext *ctx) override;
+
+    std::any visitRealEReal(GazpreaParser::RealERealContext *ctx) override;
+
+
+
+    /*
 
     std::any visitTypedefStatement(GazpreaParser::TypedefStatementContext *ctx) override;
 
@@ -49,15 +87,6 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitDoWhileLoop(GazpreaParser::DoWhileLoopContext *ctx) override;
 
-    std::any visitDecl(GazpreaParser::DeclContext *ctx) override;
-
-    std::any visitInferredDecl(GazpreaParser::InferredDeclContext *ctx) override;
-
-    std::any visitVarSizedDecl(GazpreaParser::VarSizedDeclContext *ctx) override;
-
-    std::any visitQualifier(GazpreaParser::QualifierContext *ctx) override;
-
-    std::any visitType(GazpreaParser::TypeContext *ctx) override;
 
     std::any visitSizedVecType(GazpreaParser::SizedVecTypeContext *ctx) override;
 
@@ -67,11 +96,12 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitUnSizedMatType(GazpreaParser::UnSizedMatTypeContext *ctx) override;
 
-    std::any visitTupleType(GazpreaParser::TupleTypeContext *ctx) override;
+    
+    
 
-    std::any visitTupleField(GazpreaParser::TupleFieldContext *ctx) override;
+    
 
-    std::any visitParenthesisExpr(GazpreaParser::ParenthesisExprContext *ctx) override;
+    
 
     std::any visitDotAccessExpr(GazpreaParser::DotAccessExprContext *ctx) override;
 
@@ -97,20 +127,8 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitStringLiteralExpr(GazpreaParser::StringLiteralExprContext *ctx) override;
 
-    std::any visitCharLiteralExpr(GazpreaParser::CharLiteralExprContext *ctx) override;
+    */
 
-    std::any visitBoolLiteralExpr(GazpreaParser::BoolLiteralExprContext *ctx) override;
-
-    std::any visitIdExpr(GazpreaParser::IdExprContext *ctx) override;
-
-    std::any visitIntLiteralExpr(GazpreaParser::IntLiteralExprContext *ctx) override;
     
-    std::any visitPreDotReal(GazpreaParser::PreDotRealContext *ctx) override;
-
-    std::any visitPostDotReal(GazpreaParser::PostDotRealContext *ctx) override;
-
-    std::any visitIntEReal(GazpreaParser::IntERealContext *ctx) override;
-
-    std::any visitRealEReal(GazpreaParser::RealERealContext *ctx) override;
 };
 #endif
