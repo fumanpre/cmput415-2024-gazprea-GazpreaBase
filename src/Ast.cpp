@@ -2,9 +2,9 @@
 
 #include <sstream>
 
-AST::AST() : {}
+AST::AST() {}
 AST::AST(antlr4::Token* token) : token(std::make_shared<antlr4::CommonToken>(token)) {}
-AST::AST(size_t tokenType) : { token = std::make_shared<antlr4::CommonToken>(tokenType); }
+AST::AST(size_t tokenType) { token = std::make_shared<antlr4::CommonToken>(tokenType); }
 
 size_t AST::getNodeType() { return token->getType(); }
 
