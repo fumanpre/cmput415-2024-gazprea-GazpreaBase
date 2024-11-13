@@ -1,6 +1,6 @@
 grammar Gazprea;
 
-file:   stat* EOF;
+file:   stat* EOF; // comment
 
 stat:   assignment ';'                              #assignmentStat
     |   variableDeclaration ';'                     #declarationStat
