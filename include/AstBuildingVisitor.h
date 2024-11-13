@@ -17,6 +17,8 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitVarSizedDecl(GazpreaParser::VarSizedDeclContext *ctx) override;
 
+    std::any visitAssignmentStatement(GazpreaParser::AssignmentStatementContext *ctx);
+
     std::any visitQualifier(GazpreaParser::QualifierContext *ctx) override;
 
     std::any visitType(GazpreaParser::TypeContext *ctx) override;
@@ -24,6 +26,14 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
     std::any visitTupleType(GazpreaParser::TupleTypeContext *ctx) override;
 
     std::any visitTupleField(GazpreaParser::TupleFieldContext *ctx) override;
+
+    std::any visitIdLVal(GazpreaParser::IdLValContext *ctx) override;
+
+    std::any visitTupleAccessLVal(GazpreaParser::TupleAccessLValContext *ctx) override;
+
+    std::any visitLValAssign(GazpreaParser::LValAssignContext *ctx) override;
+
+    std::any visitMultiAssign(GazpreaParser::MultiAssignContext *ctx) override;
 
     std::any visitParenthesisExpr(GazpreaParser::ParenthesisExprContext *ctx) override;
 
@@ -42,7 +52,6 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
     std::any visitIntEReal(GazpreaParser::IntERealContext *ctx) override;
 
     std::any visitRealEReal(GazpreaParser::RealERealContext *ctx) override;
-
 
 
     /*
@@ -70,12 +79,6 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
     std::any visitProcedureDeclaration(GazpreaParser::ProcedureDeclarationContext *ctx) override;
 
     std::any visitProcedureDefinition(GazpreaParser::ProcedureDefinitionContext *ctx) override;
-
-    std::any visitIdAssign(GazpreaParser::IdAssignContext *ctx) override;
-
-    std::any visitTupleFieldAssign(GazpreaParser::TupleFieldAssignContext *ctx) override;
-
-    std::any visitTupleUnpackAssign(GazpreaParser::TupleUnpackAssignContext *ctx) override;
 
     std::any visitIdInput(GazpreaParser::IdInputContext *ctx) override;
 

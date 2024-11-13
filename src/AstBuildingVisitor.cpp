@@ -18,6 +18,10 @@ std::any AstBuildingVisitor::visitDeclarationStatement(GazpreaParser::Declaratio
     return visit(ctx->variableDeclaration());
 }
 
+std::any AstBuildingVisitor::visitAssignmentStatement(GazpreaParser::AssignmentStatementContext *ctx){
+    return visit(ctx->assignment());
+}
+
 // ^(VAR_DECL qualifier type ID expr)
 std::any AstBuildingVisitor::visitDecl(GazpreaParser::DeclContext *ctx){
     std::cout << "Visiting Decl\n"; // Debug print
@@ -113,6 +117,39 @@ std::any AstBuildingVisitor::visitTupleField(GazpreaParser::TupleFieldContext *c
     return std::make_any<std::shared_ptr<AST>>(t);
 }
 
+std::any AstBuildingVisitor::visitIdLVal(GazpreaParser::IdLValContext *ctx){
+    return std::make_any<std::shared_ptr<AST>>(std::make_shared<AST>(ctx->ID()->getSymbol()));
+}
+
+std::any AstBuildingVisitor::visitTupleAccessLVal(GazpreaParser::TupleAccessLValContext *ctx){
+    std::shared_ptr<AST> child1 = std::make_shared<AST>(GazpreaParser::TUPLE_ACCESS);
+    child1->addChild(std::make_shared<AST>(ctx->ID(0)->getSymbol()));
+    if( ctx->ID(1) != nullptr ){
+        child1->addChild(std::make_shared<AST>(ctx->ID(1)->getSymbol()));
+    }
+    else{
+        child1->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
+    }
+    return std::make_any<std::shared_ptr<AST>>(child1);
+}
+
+std::any AstBuildingVisitor::visitLValAssign(GazpreaParser::LValAssignContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::ASSIGN);
+    t->addChild(visit(ctx->lVal())); // add lVal node
+    t->addChild(visit(ctx->expr()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitMultiAssign(GazpreaParser::MultiAssignContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::ASSIGN);
+    std::shared_ptr<AST> child1 = std::make_shared<AST>(GazpreaParser::MULTI_ASSIGN);
+    for ( auto lv : ctx->lVal() ) {
+        child1->addChild(visit(lv));
+    }
+    t->addChild(child1); // add MULTI_ASSIGN node
+    t->addChild(visit(ctx->expr()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
 // START NEXT ITERATION HERE
 
 /*
@@ -266,3 +303,5 @@ std::any AstBuildingVisitor::visitRealEReal(GazpreaParser::RealERealContext *ctx
     t->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
     return std::make_any<std::shared_ptr<AST>>(t);
 }
+
+
