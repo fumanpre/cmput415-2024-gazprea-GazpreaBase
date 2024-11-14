@@ -150,95 +150,7 @@ std::any AstBuildingVisitor::visitMultiAssign(GazpreaParser::MultiAssignContext 
     t->addChild(visit(ctx->expr()));
     return std::make_any<std::shared_ptr<AST>>(t);
 }
-// START NEXT ITERATION HERE
 
-/*
-
-// ^(ASSIGN ID EXPR)
-std::any AstBuildingVisitor::visitAssignmentStat(GazpreaParser::AssignmentStatContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::ASSIGN);
-    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
-    t->addChild(visit(ctx->expr()));
-    return std::make_any<std::shared_ptr<AST>>(t);
-}
-// ^(IF expr stat* )
-std::any AstBuildingVisitor::visitConditionalStat(GazpreaParser::ConditionalStatContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::IF);
-    t->addChild(visit(ctx->expr()));
-    for ( auto stat : ctx->stat() ) {
-        t->addChild(visit(stat));
-    }
-    return std::make_any<std::shared_ptr<AST>>(t);
-}
-// ^(LOOP expr stat* )
-std::any AstBuildingVisitor::visitLoopStat(GazpreaParser::LoopStatContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::LOOP);
-    t->addChild(visit(ctx->expr()));
-    for ( auto stat : ctx->stat() ) {
-        t->addChild(visit(stat));
-    }
-    return t;
-}
-// ^(PRINT expr)
-std::any AstBuildingVisitor::visitPrintStat(GazpreaParser::PrintStatContext *ctx){
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::PRINT);
-    t->addChild(visit(ctx->expr()));
-    return t;
-}
-
-std::any AstBuildingVisitor::visitType(GazpreaParser::TypeContext *ctx){
-    // make AST node from the first token in this context
-    return std::make_shared<AST>(ctx->getStart()); 
-}
-
-// ^(MULT expr expr) | ^(DIV expr expr)
-std::any AstBuildingVisitor::visitMultDivExpr(GazpreaParser::MultDivExprContext *ctx){
-    std::shared_ptr<AST> t(nullptr);
-    if (ctx->op->getText() == "*")
-        t = std::make_shared<AST>(GazpreaParser::MULT);
-    else
-        t = std::make_shared<AST>(GazpreaParser::DIV);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
-    return t;
-}
-// ^(ADD expr expr) | ^(SUB expr expr)
-std::any AstBuildingVisitor::visitAddSubExpr(GazpreaParser::AddSubExprContext *ctx){
-    std::shared_ptr<AST> t(nullptr);
-    if (ctx->op->getText() == "+")
-        t = std::make_shared<AST>(GazpreaParser::ADD);
-    else
-        t = std::make_shared<AST>(GazpreaParser::SUB);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
-    return t;
-}
-// ^(LESS expr expr) | ^(GREAT expr expr)
-std::any AstBuildingVisitor::visitLessGreatExpr(GazpreaParser::LessGreatExprContext *ctx){
-    std::shared_ptr<AST> t(nullptr);
-    if (ctx->op->getText() == "<")
-        t = std::make_shared<AST>(GazpreaParser::LESS);
-    else
-        t = std::make_shared<AST>(GazpreaParser::GREAT);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
-    return t;
-}
-// ^(EQUALS expr expr) | ^(NOTEQUALS expr expr)
-std::any AstBuildingVisitor::visitEqNotEqExpr(GazpreaParser::EqNotEqExprContext *ctx){
-    std::shared_ptr<AST> t(nullptr);
-    if (ctx->op->getText() == "==")
-        t = std::make_shared<AST>(GazpreaParser::EQUALS);
-    else
-        t = std::make_shared<AST>(GazpreaParser::NOTEQUALS);
-    t->addChild(visit(ctx->expr(0)));
-    t->addChild(visit(ctx->expr(1)));
-    return t;
-}
-
-*/
-
-// DO TILL HERE
 std::any AstBuildingVisitor::visitParenthesisExpr(GazpreaParser::ParenthesisExprContext *ctx){
     std::cout << "Visiting ParentheisiExpr\n"; // Debug print
     return visit(ctx->expr());
@@ -278,7 +190,7 @@ std::any AstBuildingVisitor::visitPreDotReal(GazpreaParser::PreDotRealContext *c
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
     if(ctx->getStart()->getType() == GazpreaParser::DOT){
         t->addChild(std::make_shared<AST>());
-        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
+        t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
     }
     else{
         t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
@@ -449,7 +361,7 @@ std::any AstBuildingVisitor::visitTypedefStatement(GazpreaParser::TypedefStateme
 {
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::TYPEDEF);
     t->addChild(visit(ctx->allTypes()));
-    t->addChild(visit(ctx->ID()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
     return std::make_any<std::shared_ptr<AST>>(t);
 }
 
@@ -544,5 +456,155 @@ std::any AstBuildingVisitor::visitDoWhileLoop(GazpreaParser::DoWhileLoopContext 
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DO_WHILE_LOOP);
     t->addChild(visit(ctx->stat()));
     t->addChild(visit(ctx->expr()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitFuncDecStatement(GazpreaParser::FuncDecStatementContext *ctx)
+{
+    return visit(ctx->functionDeclaration());
+}
+
+std::any AstBuildingVisitor::visitFuncDeclParameter(GazpreaParser::FuncDeclParameterContext *ctx)
+{
+    return visit(ctx->allTypes());
+}
+
+// ^(FUNC_DECL RETURNTYPE NAME FUNC_DECL_PARAMETER_LIST )
+std::any AstBuildingVisitor::visitFunctionDeclaration(GazpreaParser::FunctionDeclarationContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::FUNC_DECL);
+    t->addChild(visit(ctx->allTypes()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::FUNC_DECL_PARAMETER_LIST);
+    t->addChild(child3);
+    for( auto arg : ctx->funcDeclParameter() ){
+        child3->addChild(visit(arg));
+    }
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitFuncDefParameter(GazpreaParser::FuncDefParameterContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::FUNC_DEF_PARAM);
+    t->addChild(visit(ctx->allTypes()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+// ^(FUNC_DEF_EXPR_RETURN RETURNTYPE NAME FUNC_DEF_PARAMETER_LIST EXPR)
+std::any AstBuildingVisitor::visitExprReturnFunction(GazpreaParser::ExprReturnFunctionContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::FUNC_DEF_EXPR_RETURN);
+    t->addChild(visit(ctx->allTypes()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::FUNC_DEF_PARAMETER_LIST);
+    t->addChild(child3);
+    for( auto arg : ctx->funcDefParameter() ){
+        child3->addChild(visit(arg));
+    }
+    t->addChild(visit(ctx->expr()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+// ^(FUNC_DEF_BLOCK_RETURN RETURNTYPE NAME FUNC_DEF_PARAMETER_LIST BLOCK)
+std::any AstBuildingVisitor::visitBlockEndFunction(GazpreaParser::BlockEndFunctionContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::FUNC_DEF_BLOCK_RETURN);
+    t->addChild(visit(ctx->allTypes()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::FUNC_DEF_PARAMETER_LIST);
+    t->addChild(child3);
+    for( auto arg : ctx->funcDefParameter() ){
+        child3->addChild(visit(arg));
+    }
+    t->addChild(visit(ctx->blockStat()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitProcDeclParameter(GazpreaParser::ProcDeclParameterContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::PROC_DECL_PARAM);
+    if( ctx->qualifier() != nullptr ){
+        t->addChild(visit(ctx->qualifier()));
+    }
+    else{
+        t->addChild(std::make_shared<AST>());
+    }
+    t->addChild(visit(ctx->allTypes()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitProcDefParameter(GazpreaParser::ProcDefParameterContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::PROC_DEF_PARAM);
+    if( ctx->qualifier() != nullptr ){
+        t->addChild(visit(ctx->qualifier()));
+    }
+    else{
+        t->addChild(std::make_shared<AST>());
+    }
+    t->addChild(visit(ctx->allTypes()));
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+// ^(PROC_DECL RETURNTYPE NAME PROC_DECL_PARAMETER_LIST )
+std::any AstBuildingVisitor::visitProcedureDeclaration(GazpreaParser::ProcedureDeclarationContext *ctx){
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::PROC_DECL);
+    if( ctx->allTypes() != nullptr ){
+        t->addChild(visit(ctx->allTypes()));
+    }
+    else{
+        t->addChild(std::make_shared<AST>());
+    }
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::PROC_DECL_PARAMETER_LIST);
+    t->addChild(child3);
+    for( auto arg : ctx->procDeclParameter() ){
+        child3->addChild(visit(arg));
+    }
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitProcedureDefinition(GazpreaParser::ProcedureDefinitionContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::PROC_DEF);
+    if( ctx->allTypes() != nullptr ){
+        t->addChild(visit(ctx->allTypes()));
+    }
+    else{
+        t->addChild(std::make_shared<AST>());
+    }
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::PROC_DEF_PARAMETER_LIST);
+    t->addChild(child3);
+    for( auto arg : ctx->procDefParameter() ){
+        child3->addChild(visit(arg));
+    }
+    t->addChild(visit(ctx->blockStat()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitProcedureCallStatement(GazpreaParser::ProcedureCallStatementContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::CALLSTAT);
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child2 = std::make_shared<AST>(GazpreaParser::ARG_LIST);
+    for ( auto exp : ctx->expr() ){
+        child2->addChild(visit(exp));
+    }
+    t->addChild(child2);
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitFuncProcCallExpr(GazpreaParser::FuncProcCallExprContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::CALL);
+    t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
+    std::shared_ptr<AST> child2 = std::make_shared<AST>(GazpreaParser::ARG_LIST);
+    for ( auto exp : ctx->expr() ){
+        child2->addChild(visit(exp));
+    }
+    t->addChild(child2);
     return std::make_any<std::shared_ptr<AST>>(t);
 }
