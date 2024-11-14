@@ -29,6 +29,11 @@ public:
     /** Compute string for a whole tree not just a node */
     std::string toStringTree();
 
+    /** Compute string for single node */
+    std::string toString2();
+    /** Compute string for a whole tree not just a node */
+    std::string toStringTree2();
+
     virtual ~AST();
 };
 #endif

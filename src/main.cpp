@@ -7,6 +7,8 @@
 #include "tree/ParseTreeWalker.h"
 
 #include "BackEnd.h"
+#include "Ast.h"
+#include "AstBuildingVisitor.h"
 
 #include <iostream>
 #include <fstream>
@@ -36,12 +38,14 @@ int main(int argc, char **argv) {
 
   // HOW TO USE A VISITOR
   // Make the visitor
-  // MyVisitor visitor;
+  AstBuildingVisitor visitor;
   // Visit the tree
-  // visitor.visit(tree);
+  std::shared_ptr<AST> a = std::any_cast<std::shared_ptr<AST>>(visitor.visit(tree));
+  std::cout<<(a->toStringTree()) << "\n";
+  std::cout<<(a->toStringTree2()) << "\n";
 
-  BackEnd backend;
-  backend.emitMain();
+  // BackEnd backend;
+  // backend.emitMain();
 
   // HOW TO WRITE OUT.
   // std::ofstream out(argv[2]);

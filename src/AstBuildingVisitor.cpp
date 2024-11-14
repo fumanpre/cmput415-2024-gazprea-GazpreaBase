@@ -265,17 +265,8 @@ std::any AstBuildingVisitor::visitCharLiteralExpr(GazpreaParser::CharLiteralExpr
 }
 
 std::any AstBuildingVisitor::visitPreDotReal(GazpreaParser::PreDotRealContext *ctx){
+    
     std::cout << "Visiting PreDotReal\n"; // Debug print
-    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
-    t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
-    if( ctx->INT(1) != nullptr){
-        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
-    }
-    return std::make_any<std::shared_ptr<AST>>(t);
-}
-
-std::any AstBuildingVisitor::visitPostDotReal(GazpreaParser::PostDotRealContext *ctx){
-    std::cout << "Visiting PostDotReal\n"; // Debug print
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
     if(ctx->getStart()->getType() == GazpreaParser::DOT){
         t->addChild(std::make_shared<AST>());
@@ -283,6 +274,17 @@ std::any AstBuildingVisitor::visitPostDotReal(GazpreaParser::PostDotRealContext 
     }
     else{
         t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
+        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
+    }
+    std::cout<<"EXITINGDOTPRE";
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitPostDotReal(GazpreaParser::PostDotRealContext *ctx){
+    std::cout << "Visiting PostDotReal\n"; // Debug print
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
+    t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
+    if( ctx->INT(1) != nullptr){
         t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
     }
     return std::make_any<std::shared_ptr<AST>>(t);
@@ -300,8 +302,132 @@ std::any AstBuildingVisitor::visitRealEReal(GazpreaParser::RealERealContext *ctx
     std::cout << "Visiting ReaEReal\n"; // Debug print
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::SCIENTIFIC_REAL);
     t->addChild(visit(ctx->real()));
+    std::cout<<"IN5T";
     t->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
+    std::cout<<"IN7";
     return std::make_any<std::shared_ptr<AST>>(t);
 }
 
+std::any AstBuildingVisitor::visitDotAccessExpr(GazpreaParser::DotAccessExprContext *ctx)
+{
+    std::shared_ptr<AST> child1 = std::make_shared<AST>(GazpreaParser::TUPLE_ACCESS);
+    child1->addChild(std::make_shared<AST>(ctx->ID(0)->getSymbol()));
+    if( ctx->ID(1) != nullptr ){
+        child1->addChild(std::make_shared<AST>(ctx->ID(1)->getSymbol()));
+    }
+    else{
+        child1->addChild(std::make_shared<AST>(ctx->INT()->getSymbol()));
+    }
+    return std::make_any<std::shared_ptr<AST>>(child1);
+}
 
+std::any AstBuildingVisitor::visitUnaryExpr(GazpreaParser::UnaryExprContext *ctx)
+{
+    if(ctx->op->getText() == "+"){
+        return visit(ctx->expr()); // effectively ignore the plus
+    }
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "-"){
+        t = std::make_shared<AST>(GazpreaParser::UNARY_MINUS);
+    }
+    else{
+        t = std::make_shared<AST>(GazpreaParser::BOOLEAN_NOT);
+    }
+    t->addChild(visit(ctx->expr()));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitExponentExpr(GazpreaParser::ExponentExprContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::EXPONENT);
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitMultDivRemExpr(GazpreaParser::MultDivRemExprContext *ctx)
+{
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "*"){
+        t = std::make_shared<AST>(GazpreaParser::MULT);
+    }
+    else if(ctx->op->getText() == "/"){
+        t = std::make_shared<AST>(GazpreaParser::DIV);
+    }
+    else{
+        t = std::make_shared<AST>(GazpreaParser::REM);
+    }
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitAddSubExpr(GazpreaParser::AddSubExprContext *ctx)
+{
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "+"){
+        t = std::make_shared<AST>(GazpreaParser::ADD);
+    }
+    else if(ctx->op->getText() == "-"){
+        t = std::make_shared<AST>(GazpreaParser::SUB);
+    }
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitEqNotEqExpr(GazpreaParser::EqNotEqExprContext *ctx)
+{
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "=="){
+        t = std::make_shared<AST>(GazpreaParser::EQUALS);
+    }
+    else if(ctx->op->getText() == "!="){
+        t = std::make_shared<AST>(GazpreaParser::NOTEQUALS);
+    }
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitLessGreatExpr(GazpreaParser::LessGreatExprContext *ctx)
+{
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "<"){
+        t = std::make_shared<AST>(GazpreaParser::LESS);
+    }
+    else if(ctx->op->getText() == ">"){
+        t = std::make_shared<AST>(GazpreaParser::GREATER);
+    }
+    else if(ctx->op->getText() == "<="){
+        t = std::make_shared<AST>(GazpreaParser::LESSEQUAL);
+    }
+    else if(ctx->op->getText() == ">="){
+        t = std::make_shared<AST>(GazpreaParser::GREATEREQUAL);
+    }
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitBooleanAndExpr(GazpreaParser::BooleanAndExprContext *ctx)
+{
+    std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::BOOLEAN_AND);
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}
+
+std::any AstBuildingVisitor::visitBooleanOrExpr(GazpreaParser::BooleanOrExprContext *ctx)
+{
+    std::shared_ptr<AST> t;
+    if(ctx->op->getText() == "or"){
+        t = std::make_shared<AST>(GazpreaParser::BOOLEAN_OR);
+    }
+    else if(ctx->op->getText() == "xor"){
+        t = std::make_shared<AST>(GazpreaParser::BOOLEAN_XOR);
+    }
+    t->addChild(visit(ctx->expr(0)));
+    t->addChild(visit(ctx->expr(1)));
+    return std::make_any<std::shared_ptr<AST>>(t);
+}

@@ -8,7 +8,8 @@ tokens{
     DOT_REAL,
     SCIENTIFIC_REAL,
     TUPLE_ACCESS,
-    MULTI_ASSIGN
+    MULTI_ASSIGN,
+    UNARY_MINUS
 }
 
 file:   stat* EOF;
@@ -50,9 +51,7 @@ assignment:     lVal '=' expr     #LValAssign
             |   lVal (',' lVal)+ '=' expr         #MultiAssign
             ;
 
-inputStat:  ID '<-' INPUTSTREAM     #IdInput
-        |   ID '.' (INT | ID) '<-' INPUTSTREAM #TupleFieldInput
-        ;
+inputStat:  lVal '<-' INPUTSTREAM     #LValInput;
 
 //TODO iterator loops
 loopStat:   'loop' stat     #InfiniteLoop
@@ -93,14 +92,14 @@ tupleField:  tupleFieldType ID?;
 
 expr:   '(' expr ')'                                                                                                    #ParenthesisExpr
     |   ID '.' (INT | ID)                                                                                               #DotAccessExpr
-    |   <assoc=right> op=('+' | '-' | 'not') expr                                                                       #UnaryExpr
+    |   <assoc=right> op=('+' | '-' | BOOLEAN_NOT) expr                                                                 #UnaryExpr
     |   <assoc=right> expr '^' expr                                                                                     #ExponentExpr
     |   expr op=('*' | '/' | '%') expr                                                                                  #MultDivRemExpr
     |   expr op=('+' | '-') expr                                                                                        #AddSubExpr
     |   expr op=('<' | '>' | '<=' | '>=') expr                                                                          #LessGreatExpr
     |   expr op=('==' | '!=') expr                                                                                      #EqNotEqExpr
     |   expr 'and' expr                                                                                                 #BooleanAndExpr
-    |   expr op=('or'|'xor')                                                                                            #BooleanOrExpr
+    |   expr op=('or'|'xor')  expr                                                                                         #BooleanOrExpr
     |   'as' '<' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) '>' '(' expr ')'   #TypeCastExpr
     |   '(' expr ( ',' expr )+ ')'                                                                                      #TupleLiteralExpr
     |   STRING                                                                                                          #StringLiteralExpr
@@ -111,17 +110,15 @@ expr:   '(' expr ')'                                                            
     |   ID                                                                                                              #IdExpr
     ;
 
-real:   INT '.' INT?                        #PostDotReal
-    |   INT? '.' INT                        #PreDotReal
-    |   INT ('e'|'E') INT                   #IntEReal
+real:   INT ('e'|'E') INT                   #IntEReal
     |   real ('e'|'E') INT                  #RealEReal
+    |   INT '.' INT?                        #PostDotReal
+    |   INT? '.' INT                        #PreDotReal
     ;
 
 // Lexer Rules
 OUTPUTSTREAM:   'std_output';
 INPUTSTREAM:    'std_input';
-XOR         : 'xor';
-AND         : 'and';
 AS          : 'as';
 BOOLEAN     : 'boolean';
 BREAK       : 'break';
@@ -139,8 +136,6 @@ IN          : 'in';
 INTEGER     : 'integer';
 LENGTH      : 'length';
 LOOP        : 'loop';
-NOT         : 'not';
-OR          : 'or';
 PROCEDURE   : 'procedure';
 REAL        : 'real';
 RETURN      : 'return';
@@ -158,13 +153,31 @@ WHILE       : 'while';
 STRING: '"' ( ESCAPE | . )*? '"';
 CHAR:   '\''  ( ESCAPE | . ) '\'';
 BOOL:   ('true' | 'false');
-ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
 INT:	( '+' | '-')? DIGIT+;
 
 // OPERATORS
 DOT: '.';
 ASSIGN: '=';
+BOOLEAN_NOT         : 'not';
+EXPONENT:   '^';
+MULT:   '*';
+DIV:    '/';
+REM:    '%';
+ADD:    '+';
+SUB:    '-';
+EQUALS: '==';
+NOTEQUALS:  '!=';
+LESS:   '<';
+GREATER:  '>';
+LESSEQUAL:  '<=';
+GREATEREQUAL:   '>=';
+BOOLEAN_XOR         : 'xor';
+BOOLEAN_AND         : 'and';
+BOOLEAN_OR         : 'or';
 
+
+
+ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
 
 // Skip whitespace
 WS : [ \t\r\n]+ -> skip ;

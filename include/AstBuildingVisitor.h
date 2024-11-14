@@ -53,6 +53,28 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitRealEReal(GazpreaParser::RealERealContext *ctx) override;
 
+    std::any visitDotAccessExpr(GazpreaParser::DotAccessExprContext *ctx) override;
+
+    std::any visitUnaryExpr(GazpreaParser::UnaryExprContext *ctx) override;
+
+    std::any visitExponentExpr(GazpreaParser::ExponentExprContext *ctx) override;
+
+    std::any visitMultDivRemExpr(GazpreaParser::MultDivRemExprContext *ctx) override;
+
+    std::any visitAddSubExpr(GazpreaParser::AddSubExprContext *ctx) override;
+
+    std::any visitEqNotEqExpr(GazpreaParser::EqNotEqExprContext *ctx) override;
+
+    std::any visitLessGreatExpr(GazpreaParser::LessGreatExprContext *ctx) override;
+
+    std::any visitBooleanAndExpr(GazpreaParser::BooleanAndExprContext *ctx) override;
+
+    std::any visitBooleanOrExpr(GazpreaParser::BooleanOrExprContext *ctx) override;
+
+    //std::any visitTypeCastExpr(GazpreaParser::TypeCastExprContext *ctx) override;
+
+    //std::any visitTupleLiteralExpr(GazpreaParser::TupleLiteralExprContext *ctx) override;
+
 
     /*
 
@@ -80,16 +102,13 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitProcedureDefinition(GazpreaParser::ProcedureDefinitionContext *ctx) override;
 
-    std::any visitIdInput(GazpreaParser::IdInputContext *ctx) override;
-
-    std::any visitTupleFieldInput(GazpreaParser::TupleFieldInputContext *ctx) override;
+    std::any visitLValInput(GazpreaParser::LValInputContext *ctx) override;
 
     std::any visitInfiniteLoop(GazpreaParser::InfiniteLoopContext *ctx) override;
 
     std::any visitWhileLoop(GazpreaParser::WhileLoopContext *ctx) override;
 
     std::any visitDoWhileLoop(GazpreaParser::DoWhileLoopContext *ctx) override;
-
 
     std::any visitSizedVecType(GazpreaParser::SizedVecTypeContext *ctx) override;
 
@@ -98,35 +117,6 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
     std::any visitSizedMatType(GazpreaParser::SizedMatTypeContext *ctx) override;
 
     std::any visitUnSizedMatType(GazpreaParser::UnSizedMatTypeContext *ctx) override;
-
-    
-    
-
-    
-
-    
-
-    std::any visitDotAccessExpr(GazpreaParser::DotAccessExprContext *ctx) override;
-
-    std::any visitUnaryExpr(GazpreaParser::UnaryExprContext *ctx) override;
-
-    std::any visitExponentExpr(GazpreaParser::ExponentExprContext *ctx) override;
-
-    std::any visitMultDivRemExpr(GazpreaParser::MultDivRemExprContext *ctx) override;
-
-    std::any visitAddSubExpr(GazpreaParser::AddSubExprContext *ctx) override;
-
-    std::any visitEqNotEqExpr(GazpreaParser::EqNotEqExprContext *ctx) override;
-
-    std::any visitLessGreatExpr(GazpreaParser::LessGreatExprContext *ctx) override;
-
-    std::any visitBooleanAndExpr(GazpreaParser::BooleanAndExprContext *ctx) override;
-
-    std::any visitBooleanOrExpr(GazpreaParser::BooleanOrExprContext *ctx) override;
-
-    std::any visitTypeCastExpr(GazpreaParser::TypeCastExprContext *ctx) override;
-
-    std::any visitTupleLiteralExpr(GazpreaParser::TupleLiteralExprContext *ctx) override;
 
     std::any visitStringLiteralExpr(GazpreaParser::StringLiteralExprContext *ctx) override;
 

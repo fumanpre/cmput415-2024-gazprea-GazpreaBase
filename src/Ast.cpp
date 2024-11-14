@@ -38,4 +38,26 @@ std::string AST::toStringTree() {
     return buf.str();
 }
 
+std::string AST::toString2() {
+    if (token != nullptr) {
+        return token->getText();  // For token line number
+    }
+    return "nil";
+}
+
+std::string AST::toStringTree2() {
+    if ( children.empty() ) return toString2();
+    std::stringstream buf;
+    if ( !isNil() ) {
+        buf << '(' << toString2() << ' ';
+    }
+    for (auto iter = children.begin(); iter != children.end(); iter++) {
+        std::shared_ptr<AST> t = *iter; // normalized (unnamed) children
+        if ( iter != children.begin() ) buf << ' ';
+        buf << t->toStringTree2();
+    }
+    if ( !isNil() ) buf << ')';
+    return buf.str();
+}
+
 AST::~AST() {}
