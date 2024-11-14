@@ -71,12 +71,9 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitBooleanOrExpr(GazpreaParser::BooleanOrExprContext *ctx) override;
 
-    //std::any visitTypeCastExpr(GazpreaParser::TypeCastExprContext *ctx) override;
+    std::any visitTypeCastExpr(GazpreaParser::TypeCastExprContext *ctx) override;
 
-    //std::any visitTupleLiteralExpr(GazpreaParser::TupleLiteralExprContext *ctx) override;
-
-
-    /*
+    std::any visitTupleLiteralExpr(GazpreaParser::TupleLiteralExprContext *ctx) override;
 
     std::any visitTypedefStatement(GazpreaParser::TypedefStatementContext *ctx) override;
 
@@ -92,6 +89,17 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
 
     std::any visitBlockStat(GazpreaParser::BlockStatContext *ctx) override;
 
+    std::any visitInputStatement(GazpreaParser::InputStatementContext *ctx) override;
+
+    std::any visitInfiniteLoop(GazpreaParser::InfiniteLoopContext *ctx) override;
+
+    std::any visitWhileLoop(GazpreaParser::WhileLoopContext *ctx) override;
+
+    std::any visitDoWhileLoop(GazpreaParser::DoWhileLoopContext *ctx) override;
+
+
+    /*
+
     std::any visitFunctionDeclaration(GazpreaParser::FunctionDeclarationContext *ctx) override;
 
     std::any visitExprReturnFunction(GazpreaParser::ExprReturnFunctionContext *ctx) override;
@@ -101,14 +109,6 @@ class AstBuildingVisitor : public GazpreaBaseVisitor {
     std::any visitProcedureDeclaration(GazpreaParser::ProcedureDeclarationContext *ctx) override;
 
     std::any visitProcedureDefinition(GazpreaParser::ProcedureDefinitionContext *ctx) override;
-
-    std::any visitLValInput(GazpreaParser::LValInputContext *ctx) override;
-
-    std::any visitInfiniteLoop(GazpreaParser::InfiniteLoopContext *ctx) override;
-
-    std::any visitWhileLoop(GazpreaParser::WhileLoopContext *ctx) override;
-
-    std::any visitDoWhileLoop(GazpreaParser::DoWhileLoopContext *ctx) override;
 
     std::any visitSizedVecType(GazpreaParser::SizedVecTypeContext *ctx) override;
 
