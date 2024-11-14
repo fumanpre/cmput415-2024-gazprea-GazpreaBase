@@ -190,7 +190,7 @@ std::any AstBuildingVisitor::visitPreDotReal(GazpreaParser::PreDotRealContext *c
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::DOT_REAL);
     if(ctx->getStart()->getType() == GazpreaParser::DOT){
         t->addChild(std::make_shared<AST>());
-        t->addChild(std::make_shared<AST>(ctx->INT(1)->getSymbol()));
+        t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
     }
     else{
         t->addChild(std::make_shared<AST>(ctx->INT(0)->getSymbol()));
@@ -559,7 +559,7 @@ std::any AstBuildingVisitor::visitProcedureDeclaration(GazpreaParser::ProcedureD
     }
     t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
     std::shared_ptr<AST> child3 = std::make_shared<AST>(GazpreaParser::PROC_DECL_PARAMETER_LIST);
-    t->addChild(visit(child3));
+    t->addChild(child3);
     for( auto arg : ctx->procDeclParameter() ){
         child3->addChild(visit(arg));
     }
@@ -590,7 +590,7 @@ std::any AstBuildingVisitor::visitProcedureCallStatement(GazpreaParser::Procedur
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::CALLSTAT);
     t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
     std::shared_ptr<AST> child2 = std::make_shared<AST>(GazpreaParser::ARG_LIST);
-    for ( exp : ctx->expr() ){
+    for ( auto exp : ctx->expr() ){
         child2->addChild(visit(exp));
     }
     t->addChild(child2);
@@ -602,7 +602,7 @@ std::any AstBuildingVisitor::visitFuncProcCallExpr(GazpreaParser::FuncProcCallEx
     std::shared_ptr<AST> t = std::make_shared<AST>(GazpreaParser::CALL);
     t->addChild(std::make_shared<AST>(ctx->ID()->getSymbol()));
     std::shared_ptr<AST> child2 = std::make_shared<AST>(GazpreaParser::ARG_LIST);
-    for ( exp : ctx->expr() ){
+    for ( auto exp : ctx->expr() ){
         child2->addChild(visit(exp));
     }
     t->addChild(child2);
