@@ -55,7 +55,7 @@ stat:   assignment ';'                              #AssignmentStatement
 blockStat:  '{' stat* '}';
 
 funcDeclParameter : allTypes ID?;
-functionDeclaration: 'function' ID '(' ( funcDeclParameter (',' funcDeclPrameter )* )? ')' 'returns' allTypes;
+functionDeclaration: 'function' ID '(' ( funcDeclParameter (',' funcDeclParameter )* )? ')' 'returns' allTypes;
 
 funcDefParameter: allTypes ID;
 functionDefinition: 'function' ID '(' ( funcDefParameter (',' funcDefParameter )* )? ')' 'returns' allTypes '=' expr ';' #ExprReturnFunction
