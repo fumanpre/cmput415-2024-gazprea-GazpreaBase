@@ -9,16 +9,21 @@ tokens{
     SCIENTIFIC_REAL,
     TUPLE_ACCESS,
     MULTI_ASSIGN,
-    UNARY_MINUS
+    UNARY_MINUS,
+    TUPLE_LITERAL,
+    BLOCK,
+    INF_LOOP,
+    WHILE_LOOP,
+    DO_WHILE_LOOP
 }
 
 file:   stat* EOF;
 
 stat:   assignment ';'                              #AssignmentStatement
     |   variableDeclaration ';'                     #DeclarationStatement
-    |   'typedef' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) ID ';' #TypedefStatement
+    |   'typedef' allTypes ID ';'                   #TypedefStatement
     |   expr '->' OUTPUTSTREAM ';'                  #OutputStatement
-    |   inputStat ';'                               #InputStatement
+    |   lVal '<-' INPUTSTREAM ';'                   #InputStatement
     |   blockStat                                   #BlockStatement
     |   'if' '(' expr ')' stat ('else' stat)?       #IfStatement
     |   loopStat                                    #LoopStatement
@@ -50,8 +55,6 @@ lVal:   ID                  #IdLVal
 assignment:     lVal '=' expr     #LValAssign
             |   lVal (',' lVal)+ '=' expr         #MultiAssign
             ;
-
-inputStat:  lVal '<-' INPUTSTREAM     #LValInput;
 
 //TODO iterator loops
 loopStat:   'loop' stat     #InfiniteLoop
@@ -92,15 +95,15 @@ tupleField:  tupleFieldType ID?;
 
 expr:   '(' expr ')'                                                                                                    #ParenthesisExpr
     |   ID '.' (INT | ID)                                                                                               #DotAccessExpr
-    |   <assoc=right> op=('+' | '-' | BOOLEAN_NOT) expr                                                                 #UnaryExpr
+    |   <assoc=right> op=('+' | '-' | BOOLEAN_NOT ) expr                                                                #UnaryExpr
     |   <assoc=right> expr '^' expr                                                                                     #ExponentExpr
     |   expr op=('*' | '/' | '%') expr                                                                                  #MultDivRemExpr
     |   expr op=('+' | '-') expr                                                                                        #AddSubExpr
     |   expr op=('<' | '>' | '<=' | '>=') expr                                                                          #LessGreatExpr
     |   expr op=('==' | '!=') expr                                                                                      #EqNotEqExpr
     |   expr 'and' expr                                                                                                 #BooleanAndExpr
-    |   expr op=('or'|'xor')  expr                                                                                         #BooleanOrExpr
-    |   'as' '<' ( type | sizedVecType | unSizedVecType| sizedMatType | unSizedMatType | tupleType ) '>' '(' expr ')'   #TypeCastExpr
+    |   expr op=('or'|'xor')  expr                                                                                      #BooleanOrExpr
+    |   'as' '<' allTypes '>' '(' expr ')'                                                                              #TypeCastExpr
     |   '(' expr ( ',' expr )+ ')'                                                                                      #TupleLiteralExpr
     |   STRING                                                                                                          #StringLiteralExpr
     |   real                                                                                                            #RealLiteralExpr
@@ -110,6 +113,7 @@ expr:   '(' expr ')'                                                            
     |   ID                                                                                                              #IdExpr
     ;
 
+// THIS WOULD FAIL SOME TEST CASES LIKE REAL declaration 35e4 and also won't let e or E be an ID. SHOULD FIX BEFORE PART 2
 real:   INT ('e'|'E') INT                   #IntEReal
     |   real ('e'|'E') INT                  #RealEReal
     |   INT '.' INT?                        #PostDotReal
@@ -119,19 +123,21 @@ real:   INT ('e'|'E') INT                   #IntEReal
 // Lexer Rules
 OUTPUTSTREAM:   'std_output';
 INPUTSTREAM:    'std_input';
-AS          : 'as';
-BOOLEAN     : 'boolean';
+TYPE_CAST_EXPR: 'as';
+TYPEDEF     : 'typedef';
+IF          : 'if';
+ELSE        : 'else';
 BREAK       : 'break';
+CONTINUE    : 'continue';
+
+BOOLEAN     : 'boolean';
 BY          : 'by';
 CALL        : 'call';
 CHARACTER   : 'character';
 COLUMNS     : 'columns';
 CONST       : 'const';
-CONTINUE    : 'continue';
-ELSE        : 'else';
 FORMAT      : 'format';
 FUNCTION    : 'function';
-IF          : 'if';
 IN          : 'in';
 INTEGER     : 'integer';
 LENGTH      : 'length';
@@ -143,7 +149,6 @@ RETURNS     : 'returns';
 REVERSE     : 'reverse';
 ROWS        : 'rows';
 TUPLE       : 'tuple';
-TYPEDEF     : 'typedef';
 VAR         : 'var';
 WHILE       : 'while';
 
@@ -174,7 +179,6 @@ GREATEREQUAL:   '>=';
 BOOLEAN_XOR         : 'xor';
 BOOLEAN_AND         : 'and';
 BOOLEAN_OR         : 'or';
-
 
 
 ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
