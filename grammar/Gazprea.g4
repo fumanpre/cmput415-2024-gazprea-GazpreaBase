@@ -6,7 +6,9 @@ tokens{
     TUPLE_TYPE,
     TUPLE_FIELD,
     DOT_REAL,
-    SCIENTIFIC_REAL
+    SCIENTIFIC_REAL,
+    TUPLE_ACCESS,
+    MULTI_ASSIGN
 }
 
 file:   stat* EOF;
@@ -40,10 +42,12 @@ procedureDeclaration: 'procedure' ID '(' ( qualifier? allTypes ID? (',' qualifie
 
 procedureDefinition: 'procedure' ID '(' ( qualifier? allTypes ID (',' qualifier? allTypes ID)* )? ')' ( blockStat | 'returns' allTypes blockStat );
 
+lVal:   ID                  #IdLVal
+    |   ID '.' (INT | ID)   #TupleAccessLVal
+    ;
 
-assignment:     ID '=' expr     #IdAssign
-            |   ID '.' (INT | ID) '=' expr    #TupleFieldAssign
-            |   ID (',' ID)+ '=' expr         #TupleUnpackAssign
+assignment:     lVal '=' expr     #LValAssign
+            |   lVal (',' lVal)+ '=' expr         #MultiAssign
             ;
 
 inputStat:  ID '<-' INPUTSTREAM     #IdInput
@@ -107,10 +111,10 @@ expr:   '(' expr ')'                                                            
     |   ID                                                                                                              #IdExpr
     ;
 
-real:   INT ('e'|'E') INT                   #IntEReal
-    |   real ('e'|'E') INT                  #RealEReal  
-    |   INT '.' INT?                        #PostDotReal
+real:   INT '.' INT?                        #PostDotReal
     |   INT? '.' INT                        #PreDotReal
+    |   INT ('e'|'E') INT                   #IntEReal
+    |   real ('e'|'E') INT                  #RealEReal
     ;
 
 // Lexer Rules
@@ -157,8 +161,9 @@ BOOL:   ('true' | 'false');
 ID:     ( '_' | ALPHA) (ALPHA | DIGIT | '_')* ;
 INT:	( '+' | '-')? DIGIT+;
 
-// OPERATORS USED IN AST
+// OPERATORS
 DOT: '.';
+ASSIGN: '=';
 
 
 // Skip whitespace

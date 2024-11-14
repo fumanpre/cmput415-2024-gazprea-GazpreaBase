@@ -16,7 +16,12 @@ void AST::addChild(std::shared_ptr<AST> t) {
 }
 bool AST::isNil() { return token == nullptr; }
 
-std::string AST::toString() { return token != nullptr ? token->getText() : "nil"; }
+std::string AST::toString() {
+    if (token != nullptr) {
+        return std::to_string(token->getType());  // For token line number
+    }
+    return "nil";
+}
 
 std::string AST::toStringTree() {
     if ( children.empty() ) return toString();
