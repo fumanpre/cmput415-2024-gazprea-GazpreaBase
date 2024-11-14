@@ -1,5 +1,6 @@
 grammar Gazprea;
 
+// may combine fnc and proc nodes for part 2 as they should be mostly similar
 tokens{
     FILE,
     VAR_DECL,
@@ -14,7 +15,21 @@ tokens{
     BLOCK,
     INF_LOOP,
     WHILE_LOOP,
-    DO_WHILE_LOOP
+    DO_WHILE_LOOP,
+    FUNC_DECL,
+    FUNC_DEF_EXPR_RETURN,
+    FUNC_DEF_BLOCK_RETURN,
+    FUNC_DEF_PARAM,
+    FUNC_DECL_PARAMETER_LIST,
+    FUNC_DEF_PARAMETER_LIST,
+    PROC_DECL_PARAM,
+    PROC_DEF_PARAM,
+    PROC_DECL,
+    PROC_DEF,
+    PROC_DECL_PARAMETER_LIST,
+    PROC_DEF_PARAMETER_LIST,
+    ARG_LIST,
+    CALL
 }
 
 file:   stat* EOF;
@@ -34,19 +49,24 @@ stat:   assignment ';'                              #AssignmentStatement
     |   functionDefinition                          #FuncDefStatement
     |   procedureDeclaration                        #ProcDecStatement
     |   procedureDefinition                         #ProcDefStatement
+    |   'call' ID '(' ( expr (',' expr )* )? ')' ';'#ProcedureCallStatement
     ;
 
 blockStat:  '{' stat* '}';
 
-functionDeclaration: 'function' ID '(' ( allTypes ID? (',' allTypes ID? )* )? ')' 'returns' allTypes;
+funcDeclParameter : allTypes ID?;
+functionDeclaration: 'function' ID '(' ( funcDeclParameter (',' funcDeclPrameter )* )? ')' 'returns' allTypes;
 
-functionDefinition: 'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes '=' expr ';' #ExprReturnFunction
-                |   'function' ID '(' ( allTypes ID (',' allTypes ID )* )? ')' 'returns' allTypes blockStat    #BlockEndFunction
+funcDefParameter: allTypes ID;
+functionDefinition: 'function' ID '(' ( funcDefParameter (',' funcDefParameter )* )? ')' 'returns' allTypes '=' expr ';' #ExprReturnFunction
+                |   'function' ID '(' ( funcDefParameter (',' funcDefParameter )* )? ')' 'returns' allTypes blockStat    #BlockEndFunction
                 ;
 
-procedureDeclaration: 'procedure' ID '(' ( qualifier? allTypes ID? (',' qualifier? allTypes ID?)* )? ')' ( 'returns' allTypes )? ';' ;
+procDeclParameter : qualifier? allTypes ID?;
+procedureDeclaration: 'procedure' ID '(' ( procDeclParameter (',' procDeclParameter )* )? ')' ( 'returns' allTypes )? ';' ;
 
-procedureDefinition: 'procedure' ID '(' ( qualifier? allTypes ID (',' qualifier? allTypes ID)* )? ')' ( blockStat | 'returns' allTypes blockStat );
+procDefParameter: qualifier? allTypes ID;
+procedureDefinition: 'procedure' ID '(' ( procDefParameter (',' procDefParameter )* )? ')' ( 'returns' allTypes )? blockStat ;
 
 lVal:   ID                  #IdLVal
     |   ID '.' (INT | ID)   #TupleAccessLVal
@@ -93,7 +113,8 @@ tupleType:  'tuple' '(' tupleField ( ',' tupleField )+ ')' ;
 tupleField:  tupleFieldType ID?;
 
 
-expr:   '(' expr ')'                                                                                                    #ParenthesisExpr
+expr:   ID '(' ( expr (',' expr )* )? ')'                                                                               #FuncProcCallExpr
+    |   '(' expr ')'                                                                                                    #ParenthesisExpr
     |   ID '.' (INT | ID)                                                                                               #DotAccessExpr
     |   <assoc=right> op=('+' | '-' | BOOLEAN_NOT ) expr                                                                #UnaryExpr
     |   <assoc=right> expr '^' expr                                                                                     #ExponentExpr
@@ -129,10 +150,10 @@ IF          : 'if';
 ELSE        : 'else';
 BREAK       : 'break';
 CONTINUE    : 'continue';
+CALLSTAT        : 'call';
 
 BOOLEAN     : 'boolean';
 BY          : 'by';
-CALL        : 'call';
 CHARACTER   : 'character';
 COLUMNS     : 'columns';
 CONST       : 'const';
