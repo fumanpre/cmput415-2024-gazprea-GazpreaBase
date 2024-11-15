@@ -12,6 +12,9 @@ class ScopeResolver : public AstWalker{
     std::shared_ptr<Type> resolveType(std::shared_ptr<AST> t);
     public:
     ScopeResolver();
-    void visit(std::shared_ptr<AST> t) override;
+    std::any visitFile(std::shared_ptr<AST> t) override;
+    std::any visitVAR_DECL(std::shared_ptr<AST> t) override;
+    std::any visitID(std::shared_ptr<AST> t); override;
+
 };
 #endif

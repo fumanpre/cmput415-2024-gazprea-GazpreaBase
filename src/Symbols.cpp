@@ -20,7 +20,8 @@ std::string BuiltInTypeSymbol::getName() {
     return Symbol::getName();
 }
 
-VariableSymbol::VariableSymbol(std::string name, std::shared_ptr<Type> type) : Symbol(name, type), addrHolder(nullptr) {}
+VariableSymbol::VariableSymbol(std::string name, std::shared_ptr<Type> type) : Symbol(name, type), qual(VAR) {}
+VariableSymbol::VariableSymbol(std::string name, std::shared_ptr<Type> type, Qualifier q) : Symbol(name, type), qual(q) {}
 
 ScopedSymbol::ScopedSymbol(std::string name, std::shared_ptr<Scope> scope)
     : Symbol(name), enclosingScope(scope) {}

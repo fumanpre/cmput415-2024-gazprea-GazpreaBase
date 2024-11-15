@@ -42,9 +42,10 @@ public:
 
 class GlobalScope : public BaseScope {
 public:
-    std::map<std::string, std::shared_ptr<Symbol>> types;
-    std::shared_ptr<Symbol> resolveType(const std::string &name) override;
-	void defineType(std::shared_ptr<Symbol> sym) override;
+    std::map<std::string, std::shared_ptr<Type>> types;
+    std::shared_ptr<Type> resolveType(const std::string &name);
+	void defineType(std::shared_ptr<Type> typ);
+    void defineType(const std::string &name, std::shared_ptr<Type> typ);
     GlobalScope();
     std::string getScopeName() override;
 };

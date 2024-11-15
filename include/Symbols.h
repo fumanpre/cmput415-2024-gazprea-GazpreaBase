@@ -12,6 +12,7 @@ class Scope; // forward declaration of Scope to resolve circular dependency
 
 class Type {
 public:
+    TypeEnum ty;
     virtual std::string getName() = 0;
     virtual ~Type();
 };
@@ -37,16 +38,27 @@ public:
     std::string getName();
 };
 
-class TupleTypeSymbol : public Symbol, public Type {
-public:
-    BuiltInTypeSymbol(std::string name) : Symbol(name) {}
-    std::string getName() { return Symbol::getName(); }
+enum Qualifier{
+    CONST,
+    VAR
 };
+
+enum TypeEnum{
+    INT,
+    CHAR,
+    BOOL,
+    REAL,
+    TUPLE,
+    VECTOR,
+    MATRIX
+}
 
 class VariableSymbol : public Symbol {
 public:
     // mlir::Value addr;
+    Qualifier qual;
     VariableSymbol(std::string name, std::shared_ptr<Type> type);
+    VariableSymbol(std::string name, std::shared_ptr<Type> type, Qualifier q);
 };
 
 class ScopedSymbol : public Symbol, public Scope {
@@ -77,9 +89,11 @@ public:
     std::string toString();
 };
 
-class TupleSymbol : public ScopedSymbol, public Type {
+class TupleSymbol : public ScopedSymbol, public Type { // To update
 public:
-	std::map<std::string, std::shared_ptr<Symbol>> fields;
+    Qualifier qual;
+    std::map<std::string, int> filedNameToIndexMap;
+    std::vector<std::shared_ptr<Symbol>> fields;
 
     TupleSymbol(std::string name, std::shared_ptr<Scope> enclosingScope);
 

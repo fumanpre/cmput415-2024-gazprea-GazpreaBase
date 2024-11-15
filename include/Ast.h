@@ -5,11 +5,13 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "Symbols.h"
 
 class AST { // Homogeneous AST node type
 public:
     std::shared_ptr<antlr4::Token> token;       // From which token did we create node?
     std::vector<std::shared_ptr<AST>> children; // normalized list of children
+    std::shared_ptr<Symbol> sym; // used by ID nodes to hold the symbol ptr in scope tree
     
     AST(); // for making nil-rooted nodes
     AST(antlr4::Token* token);

@@ -8,7 +8,7 @@
 #include "Scoping.h"
 #include "Symbols.h"
 
-class SymbolTable { // single-scope symtab
+class SymbolTable {
 protected:
     void initTypeSystem();
 public:	

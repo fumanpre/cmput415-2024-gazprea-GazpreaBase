@@ -37,6 +37,20 @@ std::string BaseScope::toString() {
 
 GlobalScope::GlobalScope() : BaseScope(nullptr) {}
 
+std::shared_ptr<Type> GlobalScope::resolveType(const std::string &name) {
+    auto find_s = types.find(name);
+    if ( find_s != types.end() ) return find_s->second;
+    return nullptr; // not found
+}
+
+void GlobalScope::defineType(std::shared_ptr<Type> typ) {
+    types.emplace(typ->name, typ);
+}
+
+void GlobalScope::defineType(const std::string &name, std::shared_ptr<Type> typ) {
+    types.emplace(name, typ);
+}
+
 std::string GlobalScope::getScopeName() {
     return "global"+std::to_string(scopeNum);
 }
