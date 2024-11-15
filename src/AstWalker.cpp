@@ -1,7 +1,15 @@
 #include "AstWalker.h"
 #include "GazpreaParser.h"
 
-std::any AstWalker::visit(std::shared_ptr<AST> t){
+using namespace gazprea;
+
+std::any AstWalker::visitFILE(std::shared_ptr<AST> t)
+{
+    return visitChildren(t);
+}
+
+std::any AstWalker::visit(std::shared_ptr<AST> t)
+{
     if ( t->isNil() ) {
         return visitChildren(t);
     } else {
@@ -180,6 +188,7 @@ std::any AstWalker::visit(std::shared_ptr<AST> t){
     }
 }
 std::any AstWalker::visitChildren(std::shared_ptr<AST> t) {
+<<<<<<< HEAD
     for ( auto child : t->children ) return visit(child);
 }
 
@@ -402,3 +411,228 @@ std::any visitCALLSTAT(std::shared_ptr<AST> t){
 std::any visitARG_LIST(std::shared_ptr<AST> t){
     return 0;
 }
+=======
+    for ( auto child : t->children ) visit(child);
+    return std::make_any<int>(0);
+}
+
+std::any AstWalker::visitIF(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitLOOP(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitVAR_DECL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitASSIGN(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitID(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitINT(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBOOL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitREAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitCHAR(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTUPLE(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTUPLE_TYPE(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTUPLE_FIELD(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTUPLE_ACCESS(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitMULTI_ASSIGN(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitDOT_REAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitSCIENTIFIC_REAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitUNARY_MINUS(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBOOLEAN_NOT(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitEXPONENT(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitMULT(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitDIV(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitREM(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitADD(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitSUB(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitEQUALS(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitNOTEQUALS(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitLESS(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitGREATER(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitLESSEQUAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitGREATEREQUAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBOOLEAN_AND(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBOOLEAN_OR(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBOOLEAN_XOR(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTYPE_CAST_EXPR(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTUPLE_LITERAL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitTYPEDEF(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitOUTPUTSTREAM(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBREAK(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitCONTINUE(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitRETURN(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitBLOCK(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitINPUTSTREAM(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitINF_LOOP(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitWHILE_LOOP(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitDO_WHILE_LOOP(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitFUNC_DECL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitFUNC_DEF_EXPR_RETURN(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitFUNC_DEF_PARAMETER_LIST(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitFUNC_DEF_BLOCK_RETURN(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitPROC_DECL_PARAM(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitPROC_DEF_PARAM(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitPROC_DECL(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitPROC_DEF_PARAMETER_LIST(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitCALLSTAT(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+
+std::any AstWalker::visitARG_LIST(std::shared_ptr<AST> t){
+    return visitChildren(t);
+}
+>>>>>>> 80c62e42cf575a9a7932b990c11a02a3add39ab5

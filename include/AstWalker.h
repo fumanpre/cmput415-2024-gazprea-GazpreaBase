@@ -2,9 +2,6 @@
 #define ASTWALKER_H
 
 #include "Ast.h"
-#include "GazpreaBaseVisitor.h"
-
-using namespace gazprea;
 
 class AstWalker {
 public:
