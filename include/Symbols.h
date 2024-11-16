@@ -10,9 +10,21 @@
 
 class Scope; // forward declaration of Scope to resolve circular dependency
 
+
+enum TypeEnum{
+    INT,
+    CHAR,
+    BOOL,
+    REAL,
+    TUPLE,
+    VECTOR,
+    MATRIX
+}
+
 class Type {
 public:
     TypeEnum ty;
+    Type( TypeEnum t ) : ty(t) {}
     virtual std::string getName() = 0;
     virtual ~Type();
 };
@@ -24,6 +36,7 @@ public:
     std::shared_ptr<Scope> scope;   // All symbols know what scope contains them.
 
     Symbol(std::string name);
+    Symbol(std::shared_ptr<Type> type); // for unnamed symbols with just types (in tuples)
     Symbol(std::string name, std::shared_ptr<Type> type);
     virtual std::string getName();
     virtual std::string getFullName();
@@ -34,7 +47,7 @@ public:
 
 class BuiltInTypeSymbol : public Symbol, public Type {
 public:
-    BuiltInTypeSymbol(std::string name);
+    BuiltInTypeSymbol(std::string name, TypeEnum t);
     std::string getName();
 };
 
@@ -42,16 +55,6 @@ enum Qualifier{
     CONST,
     VAR
 };
-
-enum TypeEnum{
-    INT,
-    CHAR,
-    BOOL,
-    REAL,
-    TUPLE,
-    VECTOR,
-    MATRIX
-}
 
 class VariableSymbol : public Symbol {
 public:
@@ -89,14 +92,20 @@ public:
     std::string toString();
 };
 
-class TupleSymbol : public ScopedSymbol, public Type { // To update
-public:
-    Qualifier qual;
+class TupleType : public Type {
+
+    public:
+    TupleType() : Type(TUPLE) {}
     std::map<std::string, int> filedNameToIndexMap;
     std::vector<std::shared_ptr<Symbol>> fields;
 
-    TupleSymbol(std::string name, std::shared_ptr<Scope> enclosingScope);
+}
 
+class TupleSymbol : public ScopedSymbol{ // To update
+public:
+    Qualifier qual;
+
+    TupleSymbol(std::string name, std::shared_ptr<Type> t, std::shared_ptr<Scope> enclosingScope);
     void define(std::shared_ptr<Symbol> sym);
 
     virtual std::shared_ptr<Symbol> resolve(const std::string &name);

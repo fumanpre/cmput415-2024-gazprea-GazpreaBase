@@ -1,6 +1,7 @@
 #include "Symbols.h"
 
 Symbol::Symbol(std::string name) : Symbol(name, nullptr) {}
+Symbol::Symbol(std::shared_ptr<Type> type) : name(""), type(type) {}
 Symbol::Symbol(std::string name, std::shared_ptr<Type> type) : name(name), type(type) {}
 
 std::string Symbol::getName() { return name; }
@@ -72,8 +73,8 @@ std::string MethodSymbol::toString() {
     return str.str();
 }
 
-TupleSymbol::TupleSymbol( std::string name, std::shared_ptr<Scope> enclosingScope) 
-    : ScopedSymbol(name, enclosingScope) {}
+TupleSymbol(std::string name, std::shared_ptr<Type> t, std::shared_ptr<Scope> enclosingScope)
+    : ScopedSymbol(name, t, enclosingScope) {}
 
 std::shared_ptr<Symbol> TupleSymbol::resolve(const std::string &name) {
     if (fields.count(name) == 1) {
@@ -96,10 +97,7 @@ std::shared_ptr<Symbol> TupleSymbol::resolveMember(const std::string &name) {
     return nullptr;
 }
 
-void TupleSymbol::define(std::shared_ptr<Symbol> sym) {
-    fields.emplace(sym->name, sym);
-    sym->scope = shared_from_this();
-}
+void TupleSymbol::define(std::shared_ptr<Symbol> sym) {} // won't be used
 
 std::string TupleSymbol::getScopeName() {
     return name;
