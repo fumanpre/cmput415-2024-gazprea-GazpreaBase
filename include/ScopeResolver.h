@@ -16,9 +16,8 @@ class ScopeResolver : public AstWalker{
     std::any visitFile(std::shared_ptr<AST> t) override;
     std::any visitVAR_DECL(std::shared_ptr<AST> t) override;
     std::any visitID(std::shared_ptr<AST> t); override;
-    std::any visitTUPLE_TYPE(std::shared_ptr<AST> t);
-    std::any visitTUPLE_FIELD(std::shared_ptr<AST> t);
-    std::any visitTUPLE_ACCESS(std::shared_ptr<AST> t);
+    std::any visitTUPLE_ACCESS(std::shared_ptr<AST> t) override;
+    std::any visitTYPEDEF(std::shared_ptr<AST> t) override;
 
 };
 #endif

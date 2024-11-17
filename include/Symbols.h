@@ -105,11 +105,12 @@ class TupleSymbol : public ScopedSymbol{ // To update
 public:
     Qualifier qual;
 
-    TupleSymbol(std::string name, std::shared_ptr<Type> t, std::shared_ptr<Scope> enclosingScope);
+    TupleSymbol(std::string name, std::shared_ptr<Type> t, std::shared_ptr<Scope> enclosingScope, Qualifier q);
     void define(std::shared_ptr<Symbol> sym);
 
     virtual std::shared_ptr<Symbol> resolve(const std::string &name);
     virtual std::shared_ptr<Symbol> resolveMember(const std::string &name);
+    virtual std::shared_ptr<Symbol> resolveMember(int index);
 
     virtual std::string getScopeName();
     virtual std::string getName();
