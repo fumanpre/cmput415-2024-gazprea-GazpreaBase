@@ -8,7 +8,6 @@ public:
     virtual std::any visitFILE(std::shared_ptr<AST> t);
     virtual std::any visit(std::shared_ptr<AST> t);
     virtual std::any visitChildren(std::shared_ptr<AST> t);
-    virtual std::any visitIF(std::shared_ptr<AST> t);
     virtual std::any visitVAR_DECL(std::shared_ptr<AST> t);
     virtual std::any visitASSIGN(std::shared_ptr<AST> t);
     virtual std::any visitID(std::shared_ptr<AST> t);
@@ -16,7 +15,6 @@ public:
     virtual std::any visitBOOL(std::shared_ptr<AST> t);
     virtual std::any visitREAL(std::shared_ptr<AST> t);
     virtual std::any visitCHAR(std::shared_ptr<AST> t);
-    virtual std::any visitTUPLE(std::shared_ptr<AST> t);
     virtual std::any visitTUPLE_TYPE(std::shared_ptr<AST> t);
     virtual std::any visitTUPLE_FIELD(std::shared_ptr<AST> t);
     virtual std::any visitTUPLE_ACCESS(std::shared_ptr<AST> t);
@@ -44,6 +42,7 @@ public:
     virtual std::any visitTUPLE_LITERAL(std::shared_ptr<AST> t);
     virtual std::any visitTYPEDEF(std::shared_ptr<AST> t);
     virtual std::any visitOUTPUTSTREAM(std::shared_ptr<AST> t);
+    virtual std::any visitIF(std::shared_ptr<AST> t);
     virtual std::any visitBREAK(std::shared_ptr<AST> t);
     virtual std::any visitCONTINUE(std::shared_ptr<AST> t);
     virtual std::any visitRETURN(std::shared_ptr<AST> t);

@@ -1,6 +1,7 @@
 #include "Symbols.h"
 
 Symbol::Symbol(std::string name) : Symbol(name, nullptr) {}
+Symbol::Symbol(std::shared_ptr<Type> type) : name(""), type(type) {}
 Symbol::Symbol(std::string name, std::shared_ptr<Type> type) : name(name), type(type) {}
 
 std::string Symbol::getName() { return name; }
@@ -14,7 +15,7 @@ Symbol::~Symbol() {}
 
 Type::~Type() {}
 
-BuiltInTypeSymbol::BuiltInTypeSymbol(std::string name) : Symbol(name) {}
+BuiltInTypeSymbol::BuiltInTypeSymbol(std::string name, TypeEnum t) : Symbol(name), Type(t) {}
 
 std::string BuiltInTypeSymbol::getName() {
     return Symbol::getName();
@@ -72,34 +73,30 @@ std::string MethodSymbol::toString() {
     return str.str();
 }
 
-TupleSymbol::TupleSymbol( std::string name, std::shared_ptr<Scope> enclosingScope) 
-    : ScopedSymbol(name, enclosingScope) {}
+TupleSymbol(std::string name, std::shared_ptr<Type> t, std::shared_ptr<Scope> enclosingScope, Qualifier q)
+    : ScopedSymbol(name, t, enclosingScope), qual(q) {}
 
 std::shared_ptr<Symbol> TupleSymbol::resolve(const std::string &name) {
-    if (fields.count(name) == 1) {
-        return fields.at(name);
-    }
-
-    // if not here, check any enclosing scope
-    if ( getEnclosingScope() != nullptr ) {
-        return getEnclosingScope()->resolve(name);
-    }
-
-    return nullptr; // not found
+    // Won't be used so is empty
 }
 
 std::shared_ptr<Symbol> TupleSymbol::resolveMember(const std::string &name) {
-    if (fields.count(name) == 1) {
-        return fields.at(name);
+    if (type->fieldNameToIndex.count(name) == 1) {
+        return resolveMember(type->fieldNameToIndex.at(name));
     }
     // No enclosing scope for a Tuple
     return nullptr;
 }
 
-void TupleSymbol::define(std::shared_ptr<Symbol> sym) {
-    fields.emplace(sym->name, sym);
-    sym->scope = shared_from_this();
+std::shared_ptr<Symbol> TupleSymbol::resolveMember(int index) {
+    if (index<=(type->fields).size()) {
+        return (type->fields)[index-1];
+    }
+    // No enclosing scope for a Tuple
+    return nullptr;
 }
+
+void TupleSymbol::define(std::shared_ptr<Symbol> sym) {} // won't be used
 
 std::string TupleSymbol::getScopeName() {
     return name;
@@ -112,9 +109,8 @@ std::string TupleSymbol::getName() {
 std::string TupleSymbol::toString() {
     std::stringstream str;
     str << "Tuple " << Symbol::toString() << " {" << std::endl;
-    for (auto const& f : fields) {
-        std::shared_ptr<Symbol> sym = f.second;
-        str << "\t" << sym->toString() << std::endl;
+    for (auto const& f : type->fields) {
+        str << "\t" << f->toString() << std::endl;
     }
     str << "}";
     return str.str();
